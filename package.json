@@ -2,6 +2,7 @@
   "name": "calculator-app-pro",
   "version": "1.0.0",
   "description": "Electron calculator app (organized professional structure)",
+  "author": "Thai Phan Thanh Sang",
   "main": "src/main/main.js",
   "type": "commonjs",
   "scripts": {
@@ -19,12 +20,17 @@
   },
   "build": {
     "appId": "com.example.calculator",
+    "productName": "CalculatorApp",
+    "directories": {
+      "output": "dist"
+    },
     "files": [
       "src/**/*",
       "assets/**/*",
       "package.json"
     ],
     "mac": {
+      "target": "zip",
       "category": "public.app-category.utilities"
     },
     "win": {
