@@ -1,4 +1,5 @@
 name: Build, Test, and Release
+
 on:
   push:
     branches: [ "main" ]
@@ -8,14 +9,22 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10 # Giới hạn 10 phút cho job test
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: npm install
-      - run: npm run lint
-      - run: npm test
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Lint code
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test
 
   build:
     needs: test
@@ -23,24 +32,29 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30 # Tăng thời gian build (mặc định 6h, nhưng thường 30 phút là đủ)
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+
       - name: Install dependencies
         run: npm install
-      - name: Build for current OS only
+
+      - name: Build for current OS
         run: |
           if [[ "$RUNNER_OS" == "macOS" ]]; then
-            npm run build -- -m
+            npm run build -- --mac --publish never
           elif [[ "$RUNNER_OS" == "Windows" ]]; then
-            npm run build -- -w
+            npm run build -- --win --publish never
           else
-            npm run build -- -l
+            npm run build -- --linux --publish never
           fi
         shell: bash
-      - name: Upload artifact
+
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: calculator-${{ matrix.os }}
